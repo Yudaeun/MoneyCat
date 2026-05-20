@@ -32,8 +32,15 @@ class TransactionRepositoryImpl @Inject constructor(
         dao.getMonthlyCategoryTotals(startDate.toString(), endDate.toString())
             .map { list -> list.map { CategorySummary(it.category, BigDecimal(it.total)) } }
 
+    override suspend fun getById(id: Long): Transaction? =
+        dao.getById(id)?.toDomain()
+
     override suspend fun insert(transaction: Transaction): Long =
         dao.insert(transaction.toEntity())
+
+    override suspend fun update(transaction: Transaction) {
+        dao.insert(transaction.toEntity())
+    }
 
     override suspend fun insertAll(transactions: List<Transaction>) =
         dao.insertAll(transactions.map { it.toEntity() })

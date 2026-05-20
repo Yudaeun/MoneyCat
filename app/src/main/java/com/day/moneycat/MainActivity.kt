@@ -14,6 +14,8 @@ import com.day.moneycat.main.MainScreen
 import com.day.moneycat.main.StartupViewModel
 import com.day.moneycat.ocr.OcrScanScreen
 import com.day.moneycat.onboarding.OnboardingScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.day.moneycat.transaction.AddTransactionScreen
 import com.moneycat.security.BiometricAuthManager
 import com.moneycat.ui.theme.MoneyCatTheme
@@ -58,7 +60,8 @@ class MainActivity : AppCompatActivity() {
                     }
                     composable("main") {
                         MainScreen(
-                            onAddTransaction = { navController.navigate("add_transaction") }
+                            onAddTransaction = { navController.navigate("add_transaction") },
+                            onEditTransaction = { id -> navController.navigate("edit_transaction/$id") },
                         )
                     }
                     composable("add_transaction") { backStackEntry ->
@@ -67,6 +70,14 @@ class MainActivity : AppCompatActivity() {
                             onBack = { navController.popBackStack() },
                             onScanReceipt = { navController.navigate("scan_receipt") },
                             ocrAmount = ocrAmount,
+                        )
+                    }
+                    composable(
+                        route = "edit_transaction/{id}",
+                        arguments = listOf(navArgument("id") { type = NavType.LongType }),
+                    ) {
+                        AddTransactionScreen(
+                            onBack = { navController.popBackStack() },
                         )
                     }
                     composable("scan_receipt") {

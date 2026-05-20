@@ -59,6 +59,9 @@ interface TransactionDao {
         lastStart: String, lastEnd: String
     ): Flow<List<CategoryTotal>>
 
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    suspend fun getById(id: Long): TransactionEntity?
+
     @Query("SELECT COUNT(*) > 0 FROM transactions WHERE dedupHash = :hash")
     suspend fun existsByHash(hash: String): Boolean
 }

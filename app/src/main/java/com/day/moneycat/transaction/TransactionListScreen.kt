@@ -1,7 +1,11 @@
 package com.day.moneycat.transaction
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,7 +14,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -38,8 +44,10 @@ import java.util.Locale
 @Composable
 fun TransactionListScreen(
     viewModel: TransactionListViewModel = hiltViewModel(),
+    onEditTransaction: (Long) -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var isSearchVisible by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         MonthNavigator(
@@ -47,7 +55,37 @@ fun TransactionListScreen(
             onPrev = viewModel::prevMonth,
             onNext = viewModel::nextMonth,
             canGoNext = state.yearMonth < YearMonth.now(),
+            isSearchActive = isSearchVisible,
+            onToggleSearch = {
+                isSearchVisible = !isSearchVisible
+                if (!isSearchVisible) viewModel.setSearchQuery("")
+            },
         )
+
+        AnimatedVisibility(
+            visible = isSearchVisible,
+            enter = expandVertically(),
+            exit = shrinkVertically(),
+        ) {
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = viewModel::setSearchQuery,
+                placeholder = { Text("카테고리 또는 메모 검색") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (state.searchQuery.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.setSearchQuery("") }) {
+                            Icon(Icons.Filled.Close, contentDescription = "검색어 지우기")
+                        }
+                    }
+                },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+            )
+        }
 
         FilterTabs(selected = state.filter, onSelect = viewModel::setFilter)
 
@@ -58,7 +96,8 @@ fun TransactionListScreen(
             state.transactions.isEmpty() -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        "이번 달 거래 내역이 없습니다",
+                        if (state.searchQuery.isNotBlank()) "검색 결과가 없습니다"
+                        else "이번 달 거래 내역이 없습니다",
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     )
                 }
@@ -81,6 +120,7 @@ fun TransactionListScreen(
                             SwipeToDeleteItem(
                                 transaction = tx,
                                 onDelete = { viewModel.delete(tx) },
+                                onClick = { onEditTransaction(tx.id) },
                             )
                         }
                     }
@@ -97,6 +137,8 @@ internal fun MonthNavigator(
     onPrev: () -> Unit,
     onNext: () -> Unit,
     canGoNext: Boolean,
+    isSearchActive: Boolean = false,
+    onToggleSearch: (() -> Unit)? = null,
 ) {
     Row(
         modifier = Modifier
@@ -109,14 +151,25 @@ internal fun MonthNavigator(
             Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "이전 달", modifier = Modifier.size(20.dp))
         }
         Text(label, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        IconButton(onClick = onNext, enabled = canGoNext) {
-            Icon(
-                Icons.AutoMirrored.Filled.ArrowForwardIos,
-                contentDescription = "다음 달",
-                modifier = Modifier.size(20.dp),
-                tint = if (canGoNext) MaterialTheme.colorScheme.onSurface
-                       else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
-            )
+        Row {
+            if (onToggleSearch != null) {
+                IconButton(onClick = onToggleSearch) {
+                    Icon(
+                        if (isSearchActive) Icons.Filled.Close else Icons.Filled.Search,
+                        contentDescription = if (isSearchActive) "검색 닫기" else "검색",
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+            IconButton(onClick = onNext, enabled = canGoNext) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = "다음 달",
+                    modifier = Modifier.size(20.dp),
+                    tint = if (canGoNext) MaterialTheme.colorScheme.onSurface
+                           else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                )
+            }
         }
     }
 }
@@ -187,7 +240,11 @@ private fun DateHeader(date: LocalDate) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SwipeToDeleteItem(transaction: Transaction, onDelete: () -> Unit) {
+private fun SwipeToDeleteItem(
+    transaction: Transaction,
+    onDelete: () -> Unit,
+    onClick: () -> Unit,
+) {
     val dismissState = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             if (value == SwipeToDismissBoxValue.EndToStart) {
@@ -222,17 +279,18 @@ private fun SwipeToDeleteItem(transaction: Transaction, onDelete: () -> Unit) {
             }
         },
     ) {
-        TransactionListItem(transaction)
+        TransactionListItem(transaction = transaction, onClick = onClick)
     }
 }
 
 @Composable
-private fun TransactionListItem(transaction: Transaction) {
+private fun TransactionListItem(transaction: Transaction, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surface)
+            .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

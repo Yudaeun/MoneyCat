@@ -50,7 +50,10 @@ private val tabs = listOf(
 )
 
 @Composable
-fun MainScreen(onAddTransaction: () -> Unit) {
+fun MainScreen(
+    onAddTransaction: () -> Unit,
+    onEditTransaction: (Long) -> Unit = {},
+) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -111,7 +114,9 @@ fun MainScreen(onAddTransaction: () -> Unit) {
                     onNavigateToInsights = { navController.navigate("insights") },
                 )
             }
-            composable(tabs[1].route) { TransactionListScreen() }
+            composable(tabs[1].route) {
+                TransactionListScreen(onEditTransaction = onEditTransaction)
+            }
             composable(tabs[2].route) { AiInsightScreen() }
             composable(tabs[3].route) {
                 StatisticsScreen(onNavigateToBudget = { navController.navigate("budget") })
