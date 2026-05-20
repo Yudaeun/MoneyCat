@@ -23,6 +23,7 @@ fun SettingsScreen(
     onNavigateToBudget: () -> Unit = {},
     onNavigateToAsset: () -> Unit = {},
     onNavigateToProfileEdit: () -> Unit = {},
+    onNavigateToCardList: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -73,6 +74,7 @@ fun SettingsScreen(
         SectionHeader("예산 · 자산")
         SettingItem(title = "예산 관리", subtitle = "카테고리별 월 예산 설정", onClick = onNavigateToBudget)
         SettingItem(title = "자산 관리", subtitle = "계좌 · 현금 · 투자 잔액 관리", onClick = onNavigateToAsset)
+        SettingItem(title = "카드 관리", subtitle = "보유 카드 및 혜택 정보 관리", onClick = onNavigateToCardList)
 
         SectionHeader("자동 입력")
         SettingItem(

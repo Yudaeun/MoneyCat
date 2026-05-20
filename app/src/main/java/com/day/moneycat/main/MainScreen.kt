@@ -26,6 +26,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.day.moneycat.asset.AssetScreen
 import com.day.moneycat.budget.BudgetScreen
+import com.day.moneycat.card.CardListScreen
 import com.day.moneycat.home.HomeScreen
 import com.day.moneycat.insight.AiInsightScreen
 import com.day.moneycat.settings.ProfileEditScreen
@@ -120,11 +121,13 @@ fun MainScreen(onAddTransaction: () -> Unit) {
                     onNavigateToBudget = { navController.navigate("budget") },
                     onNavigateToAsset = { navController.navigate("asset") },
                     onNavigateToProfileEdit = { navController.navigate("profile_edit") },
+                    onNavigateToCardList = { navController.navigate("card_list") },
                 )
             }
             composable("budget") { BudgetScreen(onBack = { navController.popBackStack() }) }
             composable("asset") { AssetScreen(onBack = { navController.popBackStack() }) }
             composable("profile_edit") { ProfileEditScreen(onBack = { navController.popBackStack() }) }
+            composable("card_list") { CardListScreen(onBack = { navController.popBackStack() }) }
         }
     }
 }

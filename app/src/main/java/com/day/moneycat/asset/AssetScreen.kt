@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.day.moneycat.transaction.formatWon
 import com.moneycat.domain.model.Asset
 import com.moneycat.domain.model.AssetType
+import com.moneycat.domain.model.Currency
 import java.math.BigDecimal
 
 private fun AssetType.label() = when (this) {
@@ -138,6 +139,7 @@ fun AssetScreen(
                         items(assetsOfType, key = { it.id }) { asset ->
                             AssetItem(
                                 asset = asset,
+                                exchangeRates = state.exchangeRates,
                                 onEdit = { editTarget = asset },
                                 onDelete = { viewModel.delete(asset) },
                             )
@@ -167,7 +169,16 @@ fun AssetScreen(
 }
 
 @Composable
-private fun AssetItem(asset: Asset, onEdit: () -> Unit, onDelete: () -> Unit) {
+private fun AssetItem(
+    asset: Asset,
+    exchangeRates: Map<String, BigDecimal>,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    val krwEquivalent = if (asset.currency != Currency.KRW) {
+        exchangeRates[asset.currency.name]?.let { rate -> asset.balance.multiply(rate) }
+    } else null
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
@@ -186,12 +197,22 @@ private fun AssetItem(asset: Asset, onEdit: () -> Unit, onDelete: () -> Unit) {
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 }
             }
-            Text(
-                formatWon(asset.balance),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    if (asset.currency == Currency.KRW) formatWon(asset.balance)
+                    else "${asset.currency.name} ${String.format("%,.2f", asset.balance)}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                if (krwEquivalent != null) {
+                    Text(
+                        "≈ ${formatWon(krwEquivalent)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    )
+                }
+            }
             Spacer(Modifier.width(4.dp))
             IconButton(onClick = onEdit, modifier = Modifier.size(32.dp)) {
                 Icon(Icons.Default.Edit, contentDescription = "수정",

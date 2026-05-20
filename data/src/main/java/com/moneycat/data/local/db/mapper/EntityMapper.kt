@@ -3,11 +3,19 @@ package com.moneycat.data.local.db.mapper
 import com.moneycat.data.local.db.entity.AiInsightEntity
 import com.moneycat.data.local.db.entity.AssetEntity
 import com.moneycat.data.local.db.entity.BudgetEntity
+import com.moneycat.data.local.db.entity.CardBenefitEntity
+import com.moneycat.data.local.db.entity.CardEntity
+import com.moneycat.data.local.db.entity.ExchangeRateEntity
 import com.moneycat.data.local.db.entity.TransactionEntity
 import com.moneycat.data.local.db.entity.UserProfileEntity
+import com.moneycat.data.local.db.relation.CardWithBenefits
 import com.moneycat.domain.model.AiInsight
 import com.moneycat.domain.model.Asset
 import com.moneycat.domain.model.Budget
+import com.moneycat.domain.model.Card
+import com.moneycat.domain.model.CardBenefit
+import com.moneycat.domain.model.CardWithBenefitsDomain
+import com.moneycat.domain.model.ExchangeRate
 import com.moneycat.domain.model.Transaction
 import com.moneycat.domain.model.UserProfile
 
@@ -117,4 +125,65 @@ fun AiInsight.toEntity() = AiInsightEntity(
     estimatedSaving = estimatedSaving,
     isRead = isRead,
     createdAt = createdAt,
+)
+
+fun CardEntity.toDomain() = Card(
+    id = id,
+    name = name,
+    bankName = bankName,
+    type = type,
+    lastFourDigits = lastFourDigits,
+    isActive = isActive,
+    annualFee = annualFee,
+    createdAt = createdAt,
+)
+
+fun Card.toEntity() = CardEntity(
+    id = id,
+    name = name,
+    bankName = bankName,
+    type = type,
+    lastFourDigits = lastFourDigits,
+    isActive = isActive,
+    annualFee = annualFee,
+    createdAt = createdAt,
+)
+
+fun CardBenefitEntity.toDomain() = CardBenefit(
+    id = id,
+    cardId = cardId,
+    category = category,
+    benefitType = benefitType,
+    discountRate = discountRate,
+    monthlyLimit = monthlyLimit,
+    description = description,
+)
+
+fun CardBenefit.toEntity() = CardBenefitEntity(
+    id = id,
+    cardId = cardId,
+    category = category,
+    benefitType = benefitType,
+    discountRate = discountRate,
+    monthlyLimit = monthlyLimit,
+    description = description,
+)
+
+fun CardWithBenefits.toDomain() = CardWithBenefitsDomain(
+    card = card.toDomain(),
+    benefits = benefits.map { it.toDomain() },
+)
+
+fun ExchangeRateEntity.toDomain() = ExchangeRate(
+    currencyPair = currencyPair,
+    rate = rate,
+    source = source,
+    updatedAt = updatedAt,
+)
+
+fun ExchangeRate.toEntity() = ExchangeRateEntity(
+    currencyPair = currencyPair,
+    rate = rate,
+    source = source,
+    updatedAt = updatedAt,
 )

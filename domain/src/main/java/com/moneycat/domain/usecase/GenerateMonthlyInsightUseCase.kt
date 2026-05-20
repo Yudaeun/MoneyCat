@@ -1,10 +1,12 @@
 package com.moneycat.domain.usecase
 
 import com.moneycat.domain.model.AiInsight
+import com.moneycat.domain.model.BenefitType
 import com.moneycat.domain.model.InsightType
 import com.moneycat.domain.model.TransactionType
 import com.moneycat.domain.repository.AiInsightRepository
 import com.moneycat.domain.repository.BudgetRepository
+import com.moneycat.domain.repository.CardRepository
 import com.moneycat.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
@@ -19,6 +21,7 @@ class GenerateMonthlyInsightUseCase @Inject constructor(
     private val transactionRepository: TransactionRepository,
     private val budgetRepository: BudgetRepository,
     private val aiInsightRepository: AiInsightRepository,
+    private val cardRepository: CardRepository,
 ) {
     suspend operator fun invoke(yearMonth: YearMonth) {
         val start = yearMonth.atDay(1)
@@ -64,6 +67,40 @@ class GenerateMonthlyInsightUseCase @Inject constructor(
                     createdAt = now,
                 )
             )
+        }
+
+        // 카드 혜택 제안 (CARD_SUGGESTION)
+        val topCategoryName = topCategory?.key
+        if (topCategoryName != null && expenses.size >= 3) {
+            val activeCards = cardRepository.getActiveCards().first()
+            val cardBenefitPairs = activeCards.flatMap { card ->
+                val withBenefits = cardRepository.getCardWithBenefits(card.id).first()
+                withBenefits?.benefits?.map { benefit -> card to benefit } ?: emptyList()
+            }
+            val matched = cardBenefitPairs.firstOrNull { pair ->
+                pair.second.category.contains(topCategoryName, ignoreCase = true) ||
+                    topCategoryName.contains(pair.second.category, ignoreCase = true)
+            }
+            if (matched != null) {
+                val card = matched.first
+                val benefit = matched.second
+                val benefitDesc = when (benefit.benefitType) {
+                    BenefitType.DISCOUNT ->
+                        "${benefit.discountRate?.multiply(BigDecimal("100"))?.toInt() ?: 0}% 할인"
+                    BenefitType.CASHBACK -> "캐시백"
+                    BenefitType.POINT -> "포인트 적립"
+                }
+                aiInsightRepository.insert(
+                    AiInsight(
+                        type = InsightType.CARD_SUGGESTION,
+                        title = "${card.name}으로 절약해 보세요",
+                        content = "이번 달 가장 많이 쓴 '$topCategoryName' 카테고리에서 " +
+                            "${card.bankName} ${card.name}의 $benefitDesc 혜택을 활용할 수 있어요. " +
+                            benefit.description,
+                        createdAt = now,
+                    )
+                )
+            }
         }
 
         // 이상 지출 감지

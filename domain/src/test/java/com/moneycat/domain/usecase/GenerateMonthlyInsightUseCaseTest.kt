@@ -8,6 +8,7 @@ import com.moneycat.domain.model.Transaction
 import com.moneycat.domain.model.TransactionType
 import com.moneycat.domain.repository.AiInsightRepository
 import com.moneycat.domain.repository.BudgetRepository
+import com.moneycat.domain.repository.CardRepository
 import com.moneycat.domain.repository.TransactionRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,12 +29,14 @@ class GenerateMonthlyInsightUseCaseTest {
     private val transactionRepo = mockk<TransactionRepository>()
     private val budgetRepo = mockk<BudgetRepository>()
     private val aiInsightRepo = mockk<AiInsightRepository>()
+    private val cardRepo = mockk<CardRepository>()
     private lateinit var useCase: GenerateMonthlyInsightUseCase
 
     @Before
     fun setup() {
-        useCase = GenerateMonthlyInsightUseCase(transactionRepo, budgetRepo, aiInsightRepo)
+        useCase = GenerateMonthlyInsightUseCase(transactionRepo, budgetRepo, aiInsightRepo, cardRepo)
         coEvery { aiInsightRepo.insert(any()) } returns Unit
+        every { cardRepo.getActiveCards() } returns flowOf(emptyList())
     }
 
     @Test
