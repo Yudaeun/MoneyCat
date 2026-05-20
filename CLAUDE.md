@@ -2,6 +2,13 @@
 
 검은 고양이 마스코트의 온디바이스 AI 가계부 앱. 취업 포트폴리오 목적.
 
+## GitHub 저장소
+
+- URL: https://github.com/Yudaeun/MoneyCat
+- 브랜치: `master`
+- **중요: 코드 변경 작업 완료 후 반드시 `git commit` + `git push origin master` 수행**
+- 절대 커밋 금지 파일: `local.properties`, `*.jks`, `*.keystore`, `google-services.json`, `.claude/`
+
 ## 모듈 구조
 
 | 모듈 | 패키지 | 역할 |
