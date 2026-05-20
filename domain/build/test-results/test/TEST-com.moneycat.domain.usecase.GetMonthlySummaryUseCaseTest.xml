@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.moneycat.domain.usecase.GetMonthlySummaryUseCaseTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-05-16T15:02:36.585Z" hostname="DESKTOP-17LK5QH" time="0.073">
+  <properties/>
+  <testcase name="correctly separates income and expense totals" classname="com.moneycat.domain.usecase.GetMonthlySummaryUseCaseTest" time="0.049"/>
+  <testcase name="budget limit is sum of all category limits" classname="com.moneycat.domain.usecase.GetMonthlySummaryUseCaseTest" time="0.006"/>
+  <testcase name="budget limit is null when no budgets set" classname="com.moneycat.domain.usecase.GetMonthlySummaryUseCaseTest" time="0.008"/>
+  <testcase name="returns zero income and expense when no transactions" classname="com.moneycat.domain.usecase.GetMonthlySummaryUseCaseTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

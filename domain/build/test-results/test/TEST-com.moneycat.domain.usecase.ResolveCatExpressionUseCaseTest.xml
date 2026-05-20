@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-05-16T15:02:36.665Z" hostname="DESKTOP-17LK5QH" time="0.002">
+  <properties/>
+  <testcase name="returns SLEEPING when no transactions for 7 days" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.001"/>
+  <testcase name="returns SLEEPING when no transactions for more than 7 days" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <testcase name="returns ALERT when expense exceeds budget limit" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.001"/>
+  <testcase name="returns HAPPY when expense reduced 10% from previous month" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <testcase name="ALERT takes priority over SLEEPING" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <testcase name="returns DEFAULT when no budget or previous month data" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <testcase name="returns DEFAULT when expense reduced less than 10% from previous month" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <testcase name="returns HAPPY when expense reduced more than 10% from previous month" classname="com.moneycat.domain.usecase.ResolveCatExpressionUseCaseTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

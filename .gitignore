@@ -1,0 +1,28 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# API 키 및 인증 파일 (절대 커밋 금지)
+google-services.json
+*.jks
+*.keystore
+/keystore/
+
+# 빌드 산출물
+*.apk
+*.aab
+
+# 문서 개인 메모
+/docs/*.draft.md

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-05-16T15:02:32.666Z" hostname="DESKTOP-17LK5QH" time="3.915">
+  <properties/>
+  <testcase name="does nothing when there are no expenses" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="3.718"/>
+  <testcase name="generates SAVING_TIP and WEEKLY_SUMMARY for normal expenses" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="0.064"/>
+  <testcase name="generates SPENDING_ALERT when expense reaches 90 percent of budget" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="0.024"/>
+  <testcase name="generates ANOMALY when single expense is more than 2_5x the average" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="0.058"/>
+  <testcase name="SAVING_TIP targets the highest spending category" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="0.027"/>
+  <testcase name="does not generate SPENDING_ALERT when expense is below 90 percent of budget" classname="com.moneycat.domain.usecase.GenerateMonthlyInsightUseCaseTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
