@@ -21,9 +21,11 @@ import com.moneycat.ui.theme.ExpenseRed
 import com.moneycat.ui.theme.IncomeGreen
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import java.math.BigDecimal
 import java.time.YearMonth
 
@@ -56,6 +58,11 @@ fun StatisticsScreen(
         }
 
         IncomeExpenseSummaryCard(income = state.totalIncome, expense = state.totalExpense)
+
+        if (state.monthlyTrend.isNotEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            MonthlyTrendSection(trend = state.monthlyTrend)
+        }
 
         Spacer(Modifier.height(16.dp))
 
@@ -127,6 +134,46 @@ private fun SummaryItem(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = color,
+        )
+    }
+}
+
+@Composable
+private fun MonthlyTrendSection(trend: List<Pair<YearMonth, BigDecimal>>) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+
+    LaunchedEffect(trend) {
+        modelProducer.runTransaction {
+            lineSeries { series(trend.map { it.second.toFloat() }) }
+        }
+    }
+
+    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+        Text(
+            "최근 6개월 지출 추이",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+        )
+        Spacer(Modifier.height(4.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            trend.forEach { (ym, _) ->
+                Text(
+                    "${ym.monthValue}월",
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                )
+            }
+        }
+        Spacer(Modifier.height(4.dp))
+        CartesianChartHost(
+            chart = rememberCartesianChart(rememberLineCartesianLayer()),
+            modelProducer = modelProducer,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(130.dp),
         )
     }
 }

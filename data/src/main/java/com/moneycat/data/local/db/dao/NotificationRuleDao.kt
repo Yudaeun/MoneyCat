@@ -21,4 +21,7 @@ interface NotificationRuleDao {
 
     @Query("SELECT * FROM notification_rules WHERE isEnabled = 1")
     suspend fun getEnabled(): List<NotificationRuleEntity>
+
+    @Query("UPDATE notification_rules SET isEnabled = :enabled WHERE id = :id")
+    suspend fun setEnabled(id: Long, enabled: Boolean)
 }

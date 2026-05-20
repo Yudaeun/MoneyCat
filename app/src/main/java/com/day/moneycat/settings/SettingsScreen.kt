@@ -24,6 +24,7 @@ fun SettingsScreen(
     onNavigateToAsset: () -> Unit = {},
     onNavigateToProfileEdit: () -> Unit = {},
     onNavigateToCardList: () -> Unit = {},
+    onNavigateToNotificationRules: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val context = LocalContext.current
@@ -79,14 +80,12 @@ fun SettingsScreen(
         SectionHeader("자동 입력")
         SettingItem(
             title = "알림 자동 입력",
-            subtitle = "카드 결제 알림에서 지출 자동 기록",
+            subtitle = "카드사별 규칙 관리 및 권한 설정",
             badge = if (isNotificationListenerEnabled) "활성화" else "설정 필요",
             badgeColor = if (isNotificationListenerEnabled)
                 MaterialTheme.colorScheme.primary
             else MaterialTheme.colorScheme.error,
-            onClick = {
-                context.startActivity(Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS"))
-            },
+            onClick = onNavigateToNotificationRules,
         )
 
         SectionHeader("데이터")

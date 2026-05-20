@@ -29,6 +29,7 @@ import com.day.moneycat.budget.BudgetScreen
 import com.day.moneycat.card.CardListScreen
 import com.day.moneycat.home.HomeScreen
 import com.day.moneycat.insight.AiInsightScreen
+import com.day.moneycat.notification.NotificationRulesScreen
 import com.day.moneycat.settings.ProfileEditScreen
 import com.day.moneycat.settings.SettingsScreen
 import com.day.moneycat.statistics.StatisticsScreen
@@ -127,12 +128,14 @@ fun MainScreen(
                     onNavigateToAsset = { navController.navigate("asset") },
                     onNavigateToProfileEdit = { navController.navigate("profile_edit") },
                     onNavigateToCardList = { navController.navigate("card_list") },
+                    onNavigateToNotificationRules = { navController.navigate("notification_rules") },
                 )
             }
             composable("budget") { BudgetScreen(onBack = { navController.popBackStack() }) }
             composable("asset") { AssetScreen(onBack = { navController.popBackStack() }) }
             composable("profile_edit") { ProfileEditScreen(onBack = { navController.popBackStack() }) }
             composable("card_list") { CardListScreen(onBack = { navController.popBackStack() }) }
+            composable("notification_rules") { NotificationRulesScreen(onBack = { navController.popBackStack() }) }
         }
     }
 }

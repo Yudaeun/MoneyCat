@@ -10,9 +10,11 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.time.YearMonth
 import javax.inject.Inject
@@ -22,6 +24,7 @@ data class StatisticsUiState(
     val expenseCategories: List<CategorySummary> = emptyList(),
     val totalIncome: BigDecimal = BigDecimal.ZERO,
     val totalExpense: BigDecimal = BigDecimal.ZERO,
+    val monthlyTrend: List<Pair<YearMonth, BigDecimal>> = emptyList(),
     val isLoading: Boolean = true,
 )
 
@@ -32,26 +35,52 @@ class StatisticsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _yearMonth = MutableStateFlow(YearMonth.now())
+    private val _monthlyTrend = MutableStateFlow<List<Pair<YearMonth, BigDecimal>>>(emptyList())
 
-    val uiState = _yearMonth.flatMapLatest { ym ->
-        combine(
-            transactionRepository.getMonthlyCategoryTotals(ym.atDay(1), ym.atEndOfMonth()),
-            transactionRepository.getByDateRange(ym.atDay(1), ym.atEndOfMonth()),
-        ) { categories, transactions ->
-            val totalIncome = transactions
-                .filter { it.type == TransactionType.INCOME }
-                .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
-            val totalExpense = transactions
+    init {
+        viewModelScope.launch { loadMonthlyTrend() }
+    }
+
+    private suspend fun loadMonthlyTrend() {
+        val now = YearMonth.now()
+        val trend = (5 downTo 0).map { offset ->
+            val ym = now.minusMonths(offset.toLong())
+            val expense = transactionRepository
+                .getByDateRange(ym.atDay(1), ym.atEndOfMonth())
+                .first()
                 .filter { it.type == TransactionType.EXPENSE }
                 .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
-            StatisticsUiState(
-                yearMonth = ym,
-                expenseCategories = categories.sortedByDescending { it.total },
-                totalIncome = totalIncome,
-                totalExpense = totalExpense,
-                isLoading = false,
-            )
+            ym to expense
         }
+        _monthlyTrend.value = trend
+    }
+
+    val uiState = combine(
+        _yearMonth.flatMapLatest { ym ->
+            combine(
+                transactionRepository.getMonthlyCategoryTotals(ym.atDay(1), ym.atEndOfMonth()),
+                transactionRepository.getByDateRange(ym.atDay(1), ym.atEndOfMonth()),
+            ) { categories, transactions ->
+                Triple(ym, categories, transactions)
+            }
+        },
+        _monthlyTrend,
+    ) { triple, trend ->
+        val (ym, categories, transactions) = triple
+        val totalIncome = transactions
+            .filter { it.type == TransactionType.INCOME }
+            .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
+        val totalExpense = transactions
+            .filter { it.type == TransactionType.EXPENSE }
+            .fold(BigDecimal.ZERO) { acc, t -> acc + t.amount }
+        StatisticsUiState(
+            yearMonth = ym,
+            expenseCategories = categories.sortedByDescending { it.total },
+            totalIncome = totalIncome,
+            totalExpense = totalExpense,
+            monthlyTrend = trend,
+            isLoading = false,
+        )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

@@ -6,6 +6,7 @@ import com.moneycat.data.local.db.entity.BudgetEntity
 import com.moneycat.data.local.db.entity.CardBenefitEntity
 import com.moneycat.data.local.db.entity.CardEntity
 import com.moneycat.data.local.db.entity.ExchangeRateEntity
+import com.moneycat.data.local.db.entity.NotificationRuleEntity
 import com.moneycat.data.local.db.entity.TransactionEntity
 import com.moneycat.data.local.db.entity.UserProfileEntity
 import com.moneycat.data.local.db.relation.CardWithBenefits
@@ -16,6 +17,7 @@ import com.moneycat.domain.model.Card
 import com.moneycat.domain.model.CardBenefit
 import com.moneycat.domain.model.CardWithBenefitsDomain
 import com.moneycat.domain.model.ExchangeRate
+import com.moneycat.domain.model.NotificationRule
 import com.moneycat.domain.model.Transaction
 import com.moneycat.domain.model.UserProfile
 
@@ -186,4 +188,11 @@ fun ExchangeRate.toEntity() = ExchangeRateEntity(
     rate = rate,
     source = source,
     updatedAt = updatedAt,
+)
+
+fun NotificationRuleEntity.toDomain() = NotificationRule(
+    id = id,
+    bankName = bankName,
+    packageName = packageName,
+    isEnabled = isEnabled,
 )
