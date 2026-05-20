@@ -14,6 +14,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneycat.domain.model.CatExpression
 import com.moneycat.ui.composable.CatMascot
@@ -29,12 +32,24 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val exportResult by viewModel.exportResult.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val isNotificationListenerEnabled = remember(context) {
-        val flat = Settings.Secure.getString(
-            context.contentResolver, "enabled_notification_listeners"
+    var isNotificationListenerEnabled by remember {
+        mutableStateOf(
+            Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+                ?.split(":")?.any { it.contains(context.packageName) } == true
         )
-        flat?.split(":")?.any { it.contains(context.packageName) } == true
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isNotificationListenerEnabled = Settings.Secure.getString(
+                    context.contentResolver, "enabled_notification_listeners"
+                )?.split(":")?.any { it.contains(context.packageName) } == true
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     LaunchedEffect(exportResult) {

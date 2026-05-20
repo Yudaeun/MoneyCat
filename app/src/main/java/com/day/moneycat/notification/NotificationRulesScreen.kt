@@ -19,6 +19,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.moneycat.domain.model.NotificationRule
 
@@ -30,10 +33,24 @@ fun NotificationRulesScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    val isListenerEnabled = remember(context) {
-        Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
-            ?.split(":")?.any { it.contains(context.packageName) } == true
+    var isListenerEnabled by remember {
+        mutableStateOf(
+            Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners")
+                ?.split(":")?.any { it.contains(context.packageName) } == true
+        )
+    }
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                isListenerEnabled = Settings.Secure.getString(
+                    context.contentResolver, "enabled_notification_listeners"
+                )?.split(":")?.any { it.contains(context.packageName) } == true
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 
     Scaffold(
