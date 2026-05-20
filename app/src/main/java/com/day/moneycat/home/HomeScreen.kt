@@ -277,6 +277,7 @@ private fun insightTint(type: InsightType) = when (type) {
     InsightType.CARD_SUGGESTION -> Color(0xFF3498DB)
     InsightType.ANOMALY -> Color(0xFFE74C3C)
     InsightType.WEEKLY_SUMMARY -> Color(0xFF9B59B6)
+    InsightType.GEMINI_ANALYSIS -> Color(0xFF7C3AED)
 }
 
 private fun catMessage(expression: CatExpression) = when (expression) {

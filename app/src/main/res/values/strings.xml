@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MoneyCat</string>
+    <string name="widget_description">이번 달 지출과 예산 현황을 홈 화면에서 확인</string>
 </resources>

@@ -26,6 +26,8 @@ workmanager = "2.9.1"
 camerax = "1.4.0"
 mlkitTextKorean = "16.0.1"
 vico = "2.0.0-beta.2"
+glance = "1.1.0"
+generativeai = "0.9.0"
 firebaseBom = "33.6.0"
 opencsv = "5.9"
 coroutines = "1.8.1"
@@ -105,6 +107,9 @@ mlkit-text-recognition-korean = { group = "com.google.mlkit", name = "text-recog
 # Vico
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+androidx-glance-appwidget = { group = "androidx.glance", name = "glance-appwidget", version.ref = "glance" }
+androidx-glance-material3 = { group = "androidx.glance", name = "glance-material3", version.ref = "glance" }
+google-generativeai = { group = "com.google.ai.client.generativeai", name = "generativeai", version.ref = "generativeai" }
 
 # Material Icons Extended
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -48,7 +49,9 @@ fun AiInsightScreen(
             InsightHeader(
                 unreadCount = unreadCount,
                 isGenerating = state.isGenerating,
+                isGeminiAnalyzing = state.isGeminiAnalyzing,
                 onGenerate = viewModel::generate,
+                onGeminiAnalyze = viewModel::geminiAnalyze,
             )
         }
 
@@ -69,48 +72,73 @@ fun AiInsightScreen(
 private fun InsightHeader(
     unreadCount: Int,
     isGenerating: Boolean,
+    isGeminiAnalyzing: Boolean,
     onGenerate: () -> Unit,
+    onGeminiAnalyze: () -> Unit,
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Column {
-            Text(
-                "AI 소비 분석",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-            )
-            if (unreadCount > 0) {
+    val isBusy = isGenerating || isGeminiAnalyzing
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Column {
                 Text(
-                    "읽지 않은 인사이트 ${unreadCount}건",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    "AI 소비 분석",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
                 )
-            } else {
-                Text(
-                    "이번 달 소비 패턴을 분석해드려요",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                )
+                if (unreadCount > 0) {
+                    Text(
+                        "읽지 않은 인사이트 ${unreadCount}건",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                } else {
+                    Text(
+                        "이번 달 소비 패턴을 분석해드려요",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+                    )
+                }
+            }
+            Button(
+                onClick = onGenerate,
+                enabled = !isBusy,
+                shape = RoundedCornerShape(12.dp),
+            ) {
+                if (isGenerating) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Icon(Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text("분석하기")
+                }
             }
         }
-        Button(
-            onClick = onGenerate,
-            enabled = !isGenerating,
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = onGeminiAnalyze,
+            enabled = !isBusy,
+            modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
         ) {
-            if (isGenerating) {
+            if (isGeminiAnalyzing) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary,
                     strokeWidth = 2.dp,
                 )
+                Spacer(Modifier.width(8.dp))
+                Text("Gemini 분석 중...")
             } else {
                 Icon(Icons.Filled.AutoAwesome, contentDescription = null, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("분석하기")
+                Text("Gemini AI 심층 분석")
             }
         }
     }
@@ -239,6 +267,11 @@ private fun insightStyle(type: InsightType) = when (type) {
         icon = Icons.Filled.BarChart,
         tint = Color(0xFF9B59B6),
         background = Color(0xFF9B59B6).copy(alpha = 0.15f),
+    )
+    InsightType.GEMINI_ANALYSIS -> InsightStyle(
+        icon = Icons.Filled.AutoAwesome,
+        tint = Color(0xFF7C3AED),
+        background = Color(0xFF7C3AED).copy(alpha = 0.15f),
     )
 }
 

@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -38,7 +40,18 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
+
+    // local.properties에서 API 키 읽기
+    val localProps = Properties()
+    val localPropsFile = rootProject.file("local.properties")
+    if (localPropsFile.exists()) localProps.load(localPropsFile.inputStream())
+
+    defaultConfig.buildConfigField(
+        "String", "GEMINI_API_KEY",
+        "\"${localProps["GEMINI_API_KEY"] ?: ""}\"",
+    )
 }
 
 dependencies {
@@ -87,6 +100,13 @@ dependencies {
     // Vico Chart
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
+
+    // Glance (홈 화면 위젯)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
+    // Gemini AI
+    implementation(libs.google.generativeai)
 
     // Firebase (google-services.json 추가 후 주석 해제)
     // implementation(platform(libs.firebase.bom))
